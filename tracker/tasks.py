@@ -21,7 +21,7 @@ def habit_to_do_reminder():
                 datetime.now(), habit.time_to_do
             ) - datetime.now() <= timedelta(minutes=10):
                 message = f"Напоминаем, вам следует {habit.action_to_do} в {habit.place_to_do} в {habit.time_to_do}."
-                tg_id = habit.creater.tg_id
+                tg_id = habit.creator.tg_id
                 result.append((message, tg_id))
                 # обновляем дату последнего действия привычки
                 habit.last_action_date = today

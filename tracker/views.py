@@ -3,7 +3,7 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
                                      UpdateAPIView)
 
-from users.permissions import IsCreater
+from users.permissions import IsCreator
 
 from .models import Habits
 from .pagination import PageSize
@@ -29,7 +29,7 @@ class HabitsUsersListApiView(ListAPIView):
     pagination_class = PageSize
 
     def get_queryset(self):
-        return Habits.objects.filter(creater=self.request.user)
+        return Habits.objects.filter(creator=self.request.user)
 
 
 class HabitsCreateApiView(CreateAPIView):
@@ -40,7 +40,7 @@ class HabitsCreateApiView(CreateAPIView):
 
     def perform_create(self, serializer):
         habit = serializer.save(
-            creater=self.request.user, last_action_date=timezone.now().date()
+            creator=self.request.user, last_action_date=timezone.now().date()
         )
         habit.save()
 
@@ -52,7 +52,7 @@ class HabitsRetrieveApiView(RetrieveAPIView):
     serializer_class = HabitsSerializer
 
     def get_permissions(self):
-        self.permission_classes = (IsCreater,)
+        self.permission_classes = (IsCreator,)
         return super().get_permissions()
 
 
@@ -63,7 +63,7 @@ class HabitsUpdateApiView(UpdateAPIView):
     serializer_class = HabitsSerializer
 
     def get_permissions(self):
-        self.permission_classes = (IsCreater,)
+        self.permission_classes = (IsCreator,)
         return super().get_permissions()
 
 
@@ -74,5 +74,5 @@ class HabitsDestroyApiView(DestroyAPIView):
     serializer_class = HabitsSerializer
 
     def get_permissions(self):
-        self.permission_classes = (IsCreater,)
+        self.permission_classes = (IsCreator,)
         return super().get_permissions()
