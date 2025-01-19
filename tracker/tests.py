@@ -11,7 +11,7 @@ class HabitsTestCase(APITestCase):
         """Подготовка исходных данных для тестирования."""
         self.user = User.objects.create(email="test@test.com")
         self.test_habit = Habits.objects.create(
-            creater=self.user,
+            creator=self.user,
             place_to_do="Test",
             action_to_do="Test",
             is_pleasant=True,
@@ -106,7 +106,7 @@ class HabitsTestCase(APITestCase):
         result = {
             "id": self.test_habit.id,
             "action_to_do": self.test_habit.action_to_do,
-            "creater": self.user.id,
+            "creator": self.user.id,
         }
 
         # выбираем из response данные для сравнения - id привычки, действие привычки и id создателя привычки
