@@ -16,8 +16,8 @@ def send_message(text, chat_id):
 
 
 # if __name__ == "__main__":
-# text = "Test message"
-# chat_id = 123456
-# send_message(
-#     text=text, chat_id=chat_id
-# ) пользователю 123456 ушло сообщение "Привет"
+#     text = "Привет"
+#     chat_id = 302963265
+#     send_message(
+#         text=text, chat_id=chat_id
+#     ) #пользователю 123456 ушло сообщение "Привет"
