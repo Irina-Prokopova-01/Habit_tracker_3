@@ -148,7 +148,7 @@ CELERY_BEAT_SCHEDULE = {
     "task-name": {
         "task": "tracker.tasks.habit_to_do_reminder",  # Путь к задаче
         "schedule": timedelta(
-            minutes=2
+            minutes=1
         ),  # Расписание выполнения задачи (например, каждые 10 минут)
     },
 }

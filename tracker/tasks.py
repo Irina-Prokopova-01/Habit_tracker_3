@@ -13,9 +13,10 @@ def habit_to_do_reminder():
     result = []
     today = datetime.now().date()
     habits = Habits.objects.filter(is_pleasant=False)
+    print(6)
     for habit in habits:
         # проверяем необходимость выполнения привычки сегодня
-        if (today - habit.last_action_date).days == habit.periodicity:
+        if (today - habit.last_action_date).days >= habit.periodicity:
             # проверяем пришло ли время выполнения привычки
             if datetime.combine(
                 datetime.now(), habit.time_to_do
@@ -26,6 +27,8 @@ def habit_to_do_reminder():
                 # обновляем дату последнего действия привычки
                 habit.last_action_date = today
                 habit.save()
+    print(result)
+    print(habits)
     # в цикле проходимся по result и отправляем напоминания через телеграмм
     if result:
         for message, tg_id in result:
