@@ -46,9 +46,10 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: |
-          pip install poetry
-          poetry install --no-interaction --no-root
+        run: |          
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
 
       - name: Run migrate
         run: python manage.py migrate
