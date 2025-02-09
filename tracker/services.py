@@ -13,7 +13,7 @@ def send_message(text, chat_id):
     requests.get(
         f"{settings.TELEGRAM_URL}{settings.BOT_TOKEN}/sendMessage", params=params
     )
-    print ("5")
+    print("5")
 
 
 # if __name__ == "__main__":

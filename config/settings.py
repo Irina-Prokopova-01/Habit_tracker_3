@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
@@ -155,3 +156,11 @@ CELERY_BEAT_SCHEDULE = {
 
 TELEGRAM_URL = "https://api.telegram.org/bot"
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+if "test" in sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
