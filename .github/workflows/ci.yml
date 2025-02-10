@@ -53,10 +53,10 @@ jobs:
 
 
       - name: Run migrate
-        run: python manage.py migrate
+        run: poetry run python manage.py migrate
 
       - name: Run tests
-        run: python manage.py test
+        run: poetry run python manage.py test
 
   build:
     needs: test
