@@ -1,126 +1,184 @@
-name: Django_CI/CD
-on: [push, pull_request]
+#name: Django_CI/CD
+#on: [push, pull_request]
+#
+#jobs:
+#  lint:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#      - name: Set up Python
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: "3.12"
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install flake8
+#      - name: Run Flake8
+#        run: flake8 .
+#
+#  tests:
+#    runs-on: ubuntu-latest
+#    needs: lint
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Set up Python
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: '3.12'
+#
+#      - name: Create .env file
+#        run: |
+#          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+#          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+#          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+#          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+#
+#      - name: Install dependencies
+#        run: |
+#          pip install poetry
+#          poetry install --no-interaction --no-root
+#
+#      - name: Set up PostgreSQL
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y postgresql-client
+#          sudo service postgresql start
+#          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'rest_user_password';"
+#          sudo -u postgres psql -c "CREATE DATABASE restdatabase;"
+#          sudo -u postgres psql -c "CREATE ROLE runner WITH LOGIN PASSWORD 'rest_user_password';"
+#          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE restdatabase TO runner;"
+#          sudo -u postgres psql -c "GRANT CREATE ON SCHEMA public TO runner;"
+#          echo "DATABASE_URL=postgres://runner:rest_user_password@localhost/restdatabase" >> $GITHUB_ENV
+#
+#      - name: Run tests
+#        run: |
+#          export SECRET_KEY="${{ secrets.SECRET_KEY }}"
+#          poetry run python manage.py test
+#
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: tests
+#    if: success()
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Deploy to server
+#        env:
+#          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+#          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+#        run: |
+#          sshpass -p "ntSHuQx?wA&u ssh -v -o StrictHostKeyChecking=no root@94.103.12.183"
+#            set -e
+#
+#            while fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+#              echo 'Waiting for other apt processes to finish...'
+#              sleep 5
+#            done
+#
+#            apt-get update && apt-get install -y python3.12-venv && \
+#            cd /root/Django_DRF && \
+#            git switch feature/homework_35.2 && \
+#            python3 -m venv venv && \
+#            source venv/bin/activate && \
+#            git pull && \
+#            pip install poetry && \
+#            sudo systemctl restart nginx
+
+name: Django CI
+
+on: [push]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
-      - name: Install dependencies
+          python-version: '3.12'
+      - name: Install Poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install flake8
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH  # Добавление Poetry в PATH
+      - name: Install dependencies
+        run: poetry install --no-root  # Установка только необходимых зависимостей
       - name: Run Flake8
-        run: flake8 .
+        run: poetry run flake8 .  # Запуск Flake8 через Poetry
 
-  tests:
+  test:
     runs-on: ubuntu-latest
     needs: lint
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: Create .env file
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install Poetry
         run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH  # Добавление Poetry в PATH
 
       - name: Install dependencies
-        run: |
-          pip install poetry
-          poetry install --no-interaction --no-root
-
-      - name: Set up PostgreSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-          sudo service postgresql start
-          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'rest_user_password';"
-          sudo -u postgres psql -c "CREATE DATABASE restdatabase;"
-          sudo -u postgres psql -c "CREATE ROLE runner WITH LOGIN PASSWORD 'rest_user_password';"
-          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE restdatabase TO runner;"
-          sudo -u postgres psql -c "GRANT CREATE ON SCHEMA public TO runner;"
-          echo "DATABASE_URL=postgres://runner:rest_user_password@localhost/restdatabase" >> $GITHUB_ENV
+        run: poetry install --no-root  # Установка только необходимых зависимостей
 
       - name: Run tests
-        run: |
-          export SECRET_KEY="${{ secrets.SECRET_KEY }}"
-          poetry run python manage.py test
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        run: poetry run python manage.py test
 
-#  build:
-#    runs-on: ubuntu-latest
-#    needs: test
-#
-#    steps:
-#      - name: Check out code
-#        uses: actions/checkout@v3
-#
-#      - name: Log in to Docker Hub
-#        run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-#
-#      - name: Build Docker image
-#        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
-#
-#      - name: Push Docker image to Docker Hub
-#        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: build
-#
-#    steps:
-#      - name: Set up SSH
-#        uses: webfactory/ssh-agent@v0.8.1
-#        with:
-#          ssh-private-key: ${{ secrets.SSH_KEY }}
-#
-#      - name: Deploy to Server
-#        run: |
-#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-#            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-#            docker stop myapp || true
-#            docker rm myapp || true
-#            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-#          EOF
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    needs: tests
-    if: success()
+    needs: test
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v3
 
-      - name: Deploy to server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
-          ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
+      - name: Log in to Docker Hub
+        run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy to Server
         run: |
-          sshpass -p "ntSHuQx?wA&u ssh -v -o StrictHostKeyChecking=no root@94.103.12.183"
-            set -e
-
-            while fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
-              echo 'Waiting for other apt processes to finish...'
-              sleep 5
-            done
-
-            apt-get update && apt-get install -y python3.12-venv && \
-            cd /root/Django_DRF && \
-            git switch feature/homework_35.2 && \
-            python3 -m venv venv && \
-            source venv/bin/activate && \
-            git pull && \
-            pip install poetry && \
-            sudo systemctl restart nginx
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+            docker stop myapp || true
+            docker rm myapp || true
+            docker run -d --name myapp -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          EOF
