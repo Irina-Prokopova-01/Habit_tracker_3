@@ -54,16 +54,6 @@ jobs:
           sudo -u postgres psql -c "GRANT CREATE ON SCHEMA public TO runner;"
           echo "DATABASE_URL=postgres://runner:rest_user_password@localhost/restdatabase" >> $GITHUB_ENV
 
-#      - name: Run makemigrations
-#        run: |
-#          export SECRET_KEY="${{ secrets.SECRET_KEY }}"
-#          poetry run python manage.py makemigrations
-#
-#      - name: Run migrate
-#        run: |
-#          export SECRET_KEY="${{ secrets.SECRET_KEY }}"
-#          poetry run python manage.py migrate
-
       - name: Run tests
         run: |
           export SECRET_KEY="${{ secrets.SECRET_KEY }}"
