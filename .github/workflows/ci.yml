@@ -73,7 +73,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
           ROOT_PASSWORD: ${{ secrets.ROOT_PASSWORD }}
         run: |
-          sshpass -p "ntSHuQx?wA&u" ssh -v -o StrictHostKeyChecking=no root@94.103.12.183"
+          sshpass -p "ntSHuQx?wA&u" ssh -v -o "StrictHostKeyChecking=no root@94.103.12.183"
             set -e
 
             while fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
