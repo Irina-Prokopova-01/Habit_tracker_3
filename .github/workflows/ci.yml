@@ -109,7 +109,7 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH  # Добавление Poetry в PATH
       - name: Install dependencies
-        run: poetry install --no-root  # Установка только необходимых зависимостей
+        run: poetry install --no-root
       - name: Run Flake8
         run: poetry run flake8 .  # Запуск Flake8 через Poetry
 
