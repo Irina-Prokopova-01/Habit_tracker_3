@@ -180,6 +180,6 @@ jobs:
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
             sudo docker stop myapp || true
-            sudo docker rm myapp || true
+            sudo docker rm myapp
             sudo docker run -d --name myapp -p 8000:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
           EOF
