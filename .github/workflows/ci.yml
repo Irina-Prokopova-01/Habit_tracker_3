@@ -181,6 +181,7 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
             sudo docker stop myapp || true
             sudo docker rm myapp
-            sudo docker run -d --name myapp -p 8000:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-#            sudo docker-compose up -d
+            sudo docker run -d --name myapp --restart unless-stopped -p 8000:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+#            sudo docker run -d --name myapp -p 8000:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+            sudo docker-compose up -d
           EOF
