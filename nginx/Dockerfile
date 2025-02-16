@@ -1,7 +1,7 @@
 FROM nginx:latest
 
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+RUN mkdir -p /habit_tracker_3/staticfiles
 
-COPY ../html/ /usr/share/nginx/html/
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80

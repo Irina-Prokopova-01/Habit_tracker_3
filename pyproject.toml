@@ -23,6 +23,7 @@ django-filter = "^24.3"
 pillow = "^11.1.0"
 requests = "^2.32.3"
 pytest = "^8.3.4"
+gunicorn = "^23.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
